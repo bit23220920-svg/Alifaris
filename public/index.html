@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALIFARISO Auto Spare - Launch Website</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 40px;
+            max-width: 600px;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .tagline {
+            color: #888;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        
+        p {
+            color: #aaa;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 16px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #dc2626;
+            border: 2px solid #dc2626;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(220, 38, 38, 0.1);
+        }
+        
+        .btn-whatsapp {
+            background: #25D366;
+            color: #fff;
+            margin-top: 15px;
+        }
+        
+        .btn-whatsapp:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3);
+        }
+        
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .info {
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(220, 38, 38, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+        
+        .info h3 {
+            color: #dc2626;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .info p {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .quick-links {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .quick-link {
+            color: #888;
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.2s;
+        }
+        
+        .quick-link:hover {
+            color: #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+        }
+        
+        /* ========================================
+           CONFIGURATION SECTION - EDIT THESE VALUES
+           ======================================== */
+        
+        /* 
+         * To change the website URL after deployment:
+         * 1. Deploy to Vercel
+         * 2. Copy your deployment URL (e.g., https://your-site.vercel.app)
+         * 3. Replace the href in the buttons below
+         */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">ALIFARISO</div>
+        <div class="tagline">Premium Auto Spare & Luxury Vehicles</div>
+        
+        <div class="card">
+            <h2>Welcome to ALIFARISO Auto Spare</h2>
+            <p>
+                Browse our exclusive collection of premium vehicles. 
+                Click below to launch the full website or contact us directly via WhatsApp.
+            </p>
+            
+            <div class="buttons">
+                <!-- Main Website Link - Update this after deployment -->
+                <a href="/" class="btn btn-primary" id="launchBtn">
+                    Launch Website
+                </a>
+                
+                <!-- Direct WhatsApp Contact -->
+                <a href="https://wa.me/260977844509?text=Hello!%20I%27m%20interested%20in%20your%20vehicles.%20Please%20share%20more%20information." 
+                   class="btn btn-whatsapp" 
+                   target="_blank">
+                    Contact via WhatsApp
+                </a>
+                
+                <!-- Quick Inventory Link -->
+                <a href="/inventory" class="btn btn-secondary">
+                    View All Vehicles
+                </a>
+            </div>
+            
+            <div class="info">
+                <h3>Contact Information</h3>
+                <p><strong>WhatsApp:</strong> +260 977 844 509</p>
+                <p><strong>Email:</strong> info@alifariso.com</p>
+            </div>
+        </div>
+        
+        <div class="quick-links">
+            <a href="/" class="quick-link">Home</a>
+            <a href="/inventory" class="quick-link">Inventory</a>
+            <a href="/about" class="quick-link">About Us</a>
+            <a href="/contact" class="quick-link">Contact</a>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // CONFIGURATION - Edit these values
+        // ========================================
+        
+        // After deploying to Vercel, update this URL
+        // Example: const DEPLOYED_URL = 'https://alifariso.vercel.app';
+        const DEPLOYED_URL = ''; // Leave empty to use relative paths
+        
+        // WhatsApp number (without + or spaces)
+        const WHATSAPP_NUMBER = '260977844509';
+        
+        // ========================================
+        
+        // Update links if deployed URL is set
+        if (DEPLOYED_URL) {
+            document.getElementById('launchBtn').href = DEPLOYED_URL;
+        }
+    </script>
+</body>
+</html>
