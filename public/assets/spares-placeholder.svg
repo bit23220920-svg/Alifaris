@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="720" viewBox="0 0 960 720">
+  <rect width="960" height="720" fill="#171717"/>
+  <rect x="36" y="36" width="888" height="648" rx="28" fill="#202020" stroke="#f97316" stroke-opacity=".45" stroke-width="3"/>
+  <path d="M398 270h164l36 57v125H362V327l36-57Zm18 42-22 35h172l-22-35H416Zm-7 81a22 22 0 1 0 0 44 22 22 0 0 0 0-44Zm142 0a22 22 0 1 0 0 44 22 22 0 0 0 0-44Z" fill="#f97316"/>
+  <text x="480" y="525" fill="#f5f5f5" font-family="Arial,sans-serif" font-size="32" font-weight="700" text-anchor="middle">SAMPLE IMAGE</text>
+  <text x="480" y="566" fill="#a3a3a3" font-family="Arial,sans-serif" font-size="20" text-anchor="middle">Placeholder only</text>
+</svg>

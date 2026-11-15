@@ -1,0 +1,71 @@
+ALIFARIS Auto Admin - Setup
+==========================
+
+What the client sees
+--------------------
+- Visit /admin and sign in with the single configured administrator email and
+  password.
+- Use the Cars and Spares sections to add, edit, or delete catalog entries.
+- Saved changes are written to Turso and read by the public catalog pages.
+- Images are entered as image URLs for now. File uploads are not enabled.
+- The database and its credentials are not shown in the admin interface.
+
+One-time setup
+--------------
+1. Create a Turso database and an authentication token in your own Turso
+   account. This project does not create an account or database for you.
+2. Copy .env.example to .env.local.
+3. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in .env.local.
+4. Choose an admin email and generate a password hash:
+
+       npm run admin:password-hash
+
+   Use a strong password of at least 12 characters. The password is typed into
+   the local terminal (visible while typing). Copy the printed
+   ADMIN_PASSWORD_HASH value into .env.local. Do not send secrets in chat or
+   commit .env.local.
+5. Set ADMIN_EMAIL to the administrator email.
+6. Create a long, random session secret locally and set ADMIN_SESSION_SECRET
+   to at least 32 characters. Keep it private and do not commit it.
+7. Apply the schema and add the existing sample catalog:
+
+       npm run db:migrate
+       npm run db:seed
+
+8. Start the website with npm run dev and visit http://localhost:3000/admin.
+
+After setup, the client can manage catalog information through the website.
+The static sample lists remain as a read fallback when Turso is not configured;
+they are not editable until the database is connected and seeded.
+
+Using the catalog editor
+------------------------
+- Spare listings with pending details cannot be ordered. Edit each listing and
+  enter its verified name, part number, photo, price, stock, condition, and
+  fitment before saving.
+- The spare editor requires a confirmation that the saved product details are
+  real. The CSV importer accepts real catalog rows only; its template contains
+  headers and no example product.
+- The order dashboard shows customer requests and lets the administrator
+  update request status. Spare checkout reduces stock when an order request is
+  submitted; car requests do not reserve or remove a vehicle from the catalog.
+  Both flows let customers choose delivery or pickup, but neither takes online
+  payment. Confirm availability, delivery costs, and payment with the customer.
+- Catalog prices are displayed in ZMW. Enter verified prices in ZMW.
+- Use photo URLs for now. Image file uploads and automatic email alerts are
+  not implemented.
+
+Security and hosting
+--------------------
+- Configure the same environment variables in the production host's secret
+  settings before deploying. Never expose TURSO_AUTH_TOKEN or
+  ADMIN_SESSION_SECRET as NEXT_PUBLIC variables.
+- This work does not deploy the site, create cloud resources, alter hosting, or
+  select a paid plan. Confirm account/plan and hosting choices before doing
+  those steps.
+- Admin sessions are signed, HTTP-only, same-site cookies that expire after
+  eight hours. There is no self-service account creation.
+- Login attempts are not rate-limited by the application. Configure host-level
+  rate limiting for /admin before exposing it publicly.
+- Keep backups of the Turso database. Deleting a catalog entry is permanent
+  except for any separate database backup.

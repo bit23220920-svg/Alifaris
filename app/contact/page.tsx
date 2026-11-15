@@ -44,17 +44,17 @@ export default function ContactPage() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-16 relative overflow-hidden">
+      <section className="pt-24 pb-12 relative overflow-hidden sm:pt-32 sm:pb-16">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
         <div className="absolute top-1/2 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         
-        <div className="container mx-auto px-4 relative">
+        <div className="container mx-auto px-3 sm:px-4 relative">
           <div className="max-w-3xl mx-auto text-center">
-            <span className="text-primary text-sm font-medium mb-4 block">Contact Us</span>
-            <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
+            <span className="text-primary text-sm font-medium mb-3 sm:mb-4 block">Contact Us</span>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4 sm:mb-6">
               Get In <span className="text-primary">Touch</span>
             </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
               Have questions about our vehicles? Want to schedule a test drive? Our team is here to help you find your perfect car.
             </p>
           </div>
@@ -62,8 +62,8 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Info & Form */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
+      <section className="py-12 sm:py-16">
+        <div className="container mx-auto px-3 sm:px-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Contact Information */}
             <div className="space-y-6">
@@ -110,10 +110,10 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Email Us</h3>
                     <a 
-                      href="mailto:info@alifariso.com" 
+                      href="mailto:info@ALIFARIS.com"
                       className="text-sm text-muted-foreground hover:text-primary transition-colors"
                     >
-                      info@alifariso.com
+                      info@ALIFARIS.com
                     </a>
                     <p className="text-xs text-muted-foreground mt-1">
                       We reply within 24 hours
@@ -144,7 +144,7 @@ export default function ContactPage() {
                 className="w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white"
               >
                 <a 
-                  href="https://wa.me/1234567890?text=Hello!%20I'm%20interested%20in%20your%20vehicles."
+                  href="https://wa.me/260977844509"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -192,7 +192,7 @@ export default function ContactPage() {
                           <Input
                             id="name"
                             name="name"
-                            placeholder="John Doe"
+                            placeholder="full name here"
                             value={formData.name}
                             onChange={handleChange}
                             required
@@ -297,7 +297,7 @@ export default function ContactPage() {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="ALIFARISO Auto Spare Location"
+              title="ALIFARIS Auto Location"
             />
           </div>
         </div>

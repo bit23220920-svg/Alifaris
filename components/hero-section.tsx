@@ -1,152 +1,290 @@
 'use client'
 
-import { ArrowRight, Shield, Award, Headphones, ChevronRight } from 'lucide-react'
+import { useState } from 'react'
+import { ArrowRight, Award, Car, Gauge, Headphones, Search, Shield, SlidersHorizontal, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { categories, getPriceRange, getYearRange, type Car as CarType } from '@/lib/cars-data'
 
-export function HeroSection() {
+const quickLinks = [
+  'Toyota',
+  'Mercedes-Benz',
+  'Land Cruiser',
+  'SUV',
+  'Truck',
+  'Under $60,000',
+]
+
+export function HeroSection({ cars }: { cars: CarType[] }) {
+  const router = useRouter()
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('')
+  const [maxPrice, setMaxPrice] = useState('')
+  const [minYear, setMinYear] = useState('')
+
+  const brands = Array.from(new Set(cars.map(car => car.brand))).sort()
+  const { min: minPrice, max: topPrice } = getPriceRange(cars)
+  const { min: oldestYear, max: newestYear } = getYearRange(cars)
+  const popularCars = quickLinks.map(label => {
+    const car =
+      label === 'Toyota'
+        ? cars.find(item => item.brand === 'Toyota')
+        : label === 'Mercedes-Benz'
+          ? cars.find(item => item.brand === 'Mercedes-Benz')
+          : label === 'Land Cruiser'
+            ? cars.find(item => item.name.toLowerCase().includes('land cruiser'))
+            : label === 'SUV'
+              ? cars.find(item => item.category === 'suv')
+              : label === 'Truck'
+                ? cars.find(item => item.category === 'truck')
+                : cars.find(item => item.price <= 60000)
+
+    return car ? { label, car } : null
+  }).filter(Boolean) as { label: string; car: typeof cars[number] }[]
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const params = new URLSearchParams()
+    if (query.trim()) params.set('q', query.trim())
+    if (category) params.set('category', category)
+    if (maxPrice) params.set('maxPrice', maxPrice)
+    if (minYear) params.set('minYear', minYear)
+
+    router.push(params.toString() ? `/inventory?${params.toString()}` : '/inventory')
+  }
+
+  const handleQuickSearch = (value: string) => {
+    if (value === 'Under $60,000') {
+      router.push('/inventory?maxPrice=60000')
+      return
+    }
+    router.push(`/inventory?q=${encodeURIComponent(value)}`)
+  }
+
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background Image */}
+    <section className="relative min-h-screen overflow-hidden bg-background">
       <div className="absolute inset-0">
         <Image
           src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG-20260313-WA0162-wwlxk8M12Vra3YuD5AnS5EaAGinc9a.jpg"
-          alt="Mercedes G63 AMG"
+          alt="Premium car stock"
           fill
-          className="object-cover object-center"
+          className="object-cover object-center opacity-45"
           priority
         />
-        {/* Multiple overlay layers for depth */}
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/40" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/50" />
-        {/* Red accent glow */}
-        <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-primary/10 blur-[120px]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-background/70" />
       </div>
 
-      {/* Animated floating elements */}
-      <div className="absolute top-1/3 right-1/3 w-80 h-80 bg-primary/5 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-primary/8 rounded-full blur-2xl animate-float" style={{ animationDelay: '1.5s' }} />
+      <div className="container mx-auto px-3 pt-24 pb-10 relative z-10 sm:px-4 sm:pt-32 lg:pt-36 lg:pb-16">
+        <div className="mb-4 grid grid-cols-1 gap-2 rounded-lg border border-border/60 bg-card/95 px-3 py-3 text-xs shadow-2xl sm:px-4 sm:text-sm lg:grid-cols-[1fr_auto] lg:items-center">
+          <div className="grid gap-2 text-muted-foreground sm:flex sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-2">
+            <span className="font-semibold text-foreground">Total Cars In Stock: {cars.length}</span>
+            <span>Cars Added Today: 3</span>
+            <span>Location: Lusaka, Zambia</span>
+            <span>Currency: USD</span>
+          </div>
+          <div className="flex items-center gap-2 font-semibold text-primary sm:justify-end sm:text-right">
+            <Star className="h-4 w-4 fill-primary" />
+            Premium Auto Dealership
+          </div>
+        </div>
 
-      <div className="container mx-auto px-4 pt-28 pb-20 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="max-w-2xl">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full glass-red mb-8 animate-slide-in-left">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
-              </span>
-              <span className="text-sm font-medium text-foreground/90">Premium Auto Dealership</span>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,360px)]">
+          <div className="min-w-0 rounded-lg border border-border/60 bg-card/95 shadow-2xl">
+            <div className="border-b border-border/60 bg-primary px-4 py-3 text-primary-foreground sm:px-5">
+              <div className="flex items-center justify-between gap-4">
+                <h1 className="text-lg font-black tracking-wide sm:text-xl md:text-2xl">SEARCH FOR CARS</h1>
+                <span className="hidden text-sm font-semibold sm:inline">{cars.length} items match</span>
+              </div>
             </div>
 
-            {/* Main Title */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] mb-8 animate-fade-in-up">
-              <span className="text-foreground">Drive Your</span>
-              <span className="block text-gradient text-6xl sm:text-7xl lg:text-8xl my-2">DREAM</span>
-              <span className="text-foreground/80">Today</span>
-            </h1>
+            <form onSubmit={handleSearch} className="p-4 sm:p-5">
+              <div className="mb-4 grid grid-cols-1 gap-3 lg:grid-cols-[1.2fr_1fr_1fr_1fr_auto]">
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by brand, model, color..."
+                    value={query}
+                    onChange={e => setQuery(e.target.value)}
+                    className="h-11 w-full rounded-md border-border/70 bg-background pl-10"
+                  />
+                </div>
 
-            {/* Description */}
-            <p className="text-lg text-muted-foreground max-w-xl mb-10 leading-relaxed animate-fade-in-up stagger-2">
-              Welcome to ALIFARISO Auto Spare. Discover our exclusive collection of premium vehicles - from rugged Land Cruisers to luxurious Mercedes AMG. Your perfect ride awaits.
-            </p>
+                <select
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  className="h-11 w-full rounded-md border border-border/70 bg-background px-3 text-sm text-foreground"
+                >
+                  <option value="">Make</option>
+                  {brands.map(brand => (
+                    <option key={brand} value={brand}>{brand}</option>
+                  ))}
+                </select>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-4 mb-16 animate-fade-in-up stagger-3">
-              <Button 
-                asChild
-                size="lg" 
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-base font-semibold rounded-full animate-pulse-glow group"
-              >
-                <Link href="/inventory">
-                  View Inventory
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <select
+                  value={category}
+                  onChange={e => setCategory(e.target.value)}
+                  className="h-11 w-full rounded-md border border-border/70 bg-background px-3 text-sm text-foreground"
+                >
+                  <option value="">Body Type</option>
+                  {categories.map(item => (
+                    <option key={item.id} value={item.id}>{item.name}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={maxPrice}
+                  onChange={e => setMaxPrice(e.target.value)}
+                  className="h-11 w-full rounded-md border border-border/70 bg-background px-3 text-sm text-foreground"
+                >
+                  <option value="">Max Price</option>
+                  {[60000, 80000, 100000, 150000, topPrice].map(price => (
+                    <option key={price} value={price}>Up to ${price.toLocaleString()}</option>
+                  ))}
+                </select>
+
+                <Button type="submit" className="h-11 w-full rounded-md bg-primary px-8 font-black uppercase hover:bg-primary/90 lg:w-auto">
+                  Search
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 border-t border-border/50 pt-4 sm:grid-cols-2 lg:grid-cols-4">
+                <select
+                  value={minYear}
+                  onChange={e => setMinYear(e.target.value)}
+                  className="h-10 w-full rounded-md border border-border/70 bg-background px-3 text-sm text-foreground"
+                >
+                  <option value="">Year From</option>
+                  {Array.from({ length: newestYear - oldestYear + 1 }, (_, index) => newestYear - index).map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+                <div className="flex min-h-10 items-center rounded-md border border-border/70 bg-background px-3 py-2 text-sm text-muted-foreground">
+                  Price range: ${minPrice.toLocaleString()} - ${topPrice.toLocaleString()}
+                </div>
+                <Link href="/inventory" className="flex min-h-10 w-full items-center justify-center rounded-md border border-border/70 bg-secondary px-3 py-2 text-sm font-semibold hover:border-primary/60">
+                  Advanced Search
+                  <SlidersHorizontal className="ml-2 h-4 w-4" />
                 </Link>
-              </Button>
-              <Button 
-                asChild
-                size="lg" 
-                variant="outline" 
-                className="border-border/50 hover:bg-secondary/50 hover:border-primary/50 px-8 py-6 text-base font-semibold rounded-full backdrop-blur-sm"
-              >
-                <Link href="/contact">
+                <Link href="/contact" className="flex min-h-10 w-full items-center justify-center rounded-md border border-border/70 bg-secondary px-3 py-2 text-sm font-semibold hover:border-primary/60">
                   Get In Touch
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
-              </Button>
-            </div>
+              </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 animate-fade-in-up stagger-4">
-              <div className="text-center sm:text-left">
-                <div className="text-3xl sm:text-4xl font-bold text-primary">50+</div>
-                <div className="text-sm text-muted-foreground mt-1">Premium Cars</div>
+              <div className="mt-5 overflow-hidden rounded-lg border border-border/60 bg-background/70 p-3 sm:p-4">
+                <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                  <span className="text-sm font-black uppercase tracking-wide text-foreground">Popular</span>
+                  <span className="text-xs font-semibold text-muted-foreground">Tap a vehicle to view details</span>
+                </div>
+
+                <div className="popular-marquee">
+                  {[...popularCars, ...popularCars].map(({ label, car }, index) => (
+                    <div key={`${label}-${car.id}-${index}`} className="popular-marquee-item">
+                      <button
+                        type="button"
+                        onClick={() => handleQuickSearch(label)}
+                        className="mb-2 w-full rounded-md border border-border/60 bg-secondary px-3 py-1.5 text-xs font-bold text-foreground hover:border-primary/70 hover:text-primary"
+                      >
+                        {label}
+                      </button>
+                      <Link
+                        href={`/car/${car.id}`}
+                        className="group block overflow-hidden rounded-lg border border-border/60 bg-card hover:border-primary/70"
+                      >
+                        <div className="relative h-32 w-full overflow-hidden sm:h-28 sm:w-44">
+                          <Image
+                            src={car.image}
+                            alt={`${car.brand} ${car.name}`}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            sizes="(max-width: 640px) 144px, 176px"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
+                          <div className="absolute bottom-2 left-2 right-2">
+                            <p className="truncate text-xs font-bold text-foreground">{car.brand}</p>
+                            <p className="truncate text-[11px] text-muted-foreground">{car.name}</p>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="text-center sm:text-left">
-                <div className="text-3xl sm:text-4xl font-bold text-foreground">100%</div>
-                <div className="text-sm text-muted-foreground mt-1">Satisfaction</div>
-              </div>
-              <div className="text-center sm:text-left">
-                <div className="text-3xl sm:text-4xl font-bold text-foreground">24/7</div>
-                <div className="text-sm text-muted-foreground mt-1">Support</div>
-              </div>
-            </div>
+            </form>
           </div>
 
-          {/* Right side - Feature Cards */}
-          <div className="hidden lg:block">
-            <div className="grid gap-4 animate-slide-in-right">
-              {/* Trust badges */}
-              <div className="glass-light rounded-2xl p-6 hover-lift card-glow">
-                <div className="flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-xl bg-primary/15 flex items-center justify-center">
-                    <Shield className="w-7 h-7 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-foreground text-lg">Certified Quality</h3>
-                    <p className="text-sm text-muted-foreground mt-0.5">Every vehicle thoroughly inspected</p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground ml-auto" />
-                </div>
+          <div className="grid gap-4">
+            <div className="rounded-lg border border-primary/50 bg-primary p-4 sm:p-5 text-primary-foreground shadow-2xl overflow-hidden">
+              <p className="text-xs sm:text-sm font-bold uppercase tracking-wide">Today Special Offer</p>
+              <h2 className="mt-3 text-xl sm:text-2xl lg:text-3xl font-black leading-tight">Drive Your DREAM Today</h2>
+              <p className="mt-3 text-xs sm:text-sm leading-relaxed text-primary-foreground/85">
+                Welcome to ALIFARIS Auto. Discover premium vehicles from rugged Land Cruisers to luxurious Mercedes AMG.
+              </p>
+              <Button asChild className="mt-5 h-10 rounded-md bg-background px-5 font-bold text-foreground hover:bg-background/90">
+                <Link href="/inventory">
+                  View Inventory
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+
+              <div className="grid grid-cols-3 gap-2">
+              <div className="rounded-lg border border-border/60 bg-card/95 p-3">
+                <p className="text-xl sm:text-2xl font-black text-primary">50+</p>
+                <p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">Premium Cars</p>
               </div>
-              
-              <div className="glass-light rounded-2xl p-6 hover-lift card-glow stagger-1">
-                <div className="flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-xl bg-primary/15 flex items-center justify-center">
-                    <Award className="w-7 h-7 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-foreground text-lg">Best Prices</h3>
-                    <p className="text-sm text-muted-foreground mt-0.5">Competitive rates guaranteed</p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground ml-auto" />
-                </div>
+              <div className="rounded-lg border border-border/60 bg-card/95 p-3">
+                <p className="text-xl sm:text-2xl font-black text-foreground">100%</p>
+                <p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">Satisfaction</p>
               </div>
-              
-              <div className="glass-light rounded-2xl p-6 hover-lift card-glow stagger-2">
-                <div className="flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-xl bg-primary/15 flex items-center justify-center">
-                    <Headphones className="w-7 h-7 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-foreground text-lg">24/7 Support</h3>
-                    <p className="text-sm text-muted-foreground mt-0.5">We are always here for you</p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground ml-auto" />
-                </div>
+              <div className="rounded-lg border border-border/60 bg-card/95 p-3">
+                <p className="text-xl sm:text-2xl font-black text-foreground">24/7</p>
+                <p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">Support</p>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background via-background/80 to-transparent" />
-      
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex items-start justify-center p-2">
-          <div className="w-1.5 h-3 bg-primary rounded-full animate-pulse" />
+        <div className="mt-5 grid gap-3 md:grid-cols-4">
+          {[
+            { icon: Shield, title: 'Certified Quality', text: 'Every vehicle thoroughly inspected' },
+            { icon: Award, title: 'Best Prices', text: 'Competitive rates guaranteed' },
+            { icon: Headphones, title: '24/7 Support', text: 'We are always here for you' },
+            { icon: Gauge, title: 'Fast Inquiry', text: 'WhatsApp and email support ready' },
+          ].map(item => (
+            <div key={item.title} className="flex items-center gap-3 rounded-lg border border-border/60 bg-card/90 p-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary">
+                <item.icon className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground">{item.title}</h3>
+                <p className="text-xs text-muted-foreground">{item.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-5 -mx-3 overflow-x-auto scrollbar-none sm:mx-0">
+          <div className="flex gap-3 px-3 pb-2 sm:grid sm:grid-cols-2 sm:px-0 lg:grid-cols-4 sm:pb-0">
+            {categories.slice(0, 4).map(item => (
+              <Link
+                key={item.id}
+                href={`/inventory?category=${item.id}`}
+                className="flex items-center justify-between rounded-lg border border-border/60 bg-secondary/90 px-4 py-3 text-sm font-bold hover:border-primary/70 hover:text-primary shrink-0 sm:shrink"
+              >
+                <span className="flex items-center gap-2 whitespace-nowrap">
+                  <Car className="h-4 w-4" />
+                  {item.name}
+                </span>
+                <ArrowRight className="h-4 w-4 ml-2 shrink-0" />
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </section>

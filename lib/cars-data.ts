@@ -293,19 +293,115 @@ export function getCarById(id: string): Car | undefined {
   return cars.find(car => car.id === id)
 }
 
-export function getCarsByCategory(category: CarCategory): Car[] {
-  return cars.filter(car => car.category === category)
+export function getCarsByCategory(category: CarCategory, sourceCars: Car[] = cars): Car[] {
+  return sourceCars.filter(car => car.category === category)
 }
 
-export function getFeaturedCars(): Car[] {
-  return cars.slice(0, 6)
+export function getFeaturedCars(sourceCars: Car[] = cars): Car[] {
+  return sourceCars.slice(0, 6)
 }
 
 export function formatPrice(price: number): string {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-ZM', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'ZMW',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(price)
+}
+
+export interface SearchFilters {
+  query?: string
+  category?: CarCategory | null
+  minPrice?: number
+  maxPrice?: number
+  minYear?: number
+  maxYear?: number
+  fuelType?: string
+  transmission?: string
+  sortBy?: 'price-asc' | 'price-desc' | 'year-desc' | 'name'
+}
+
+export function searchCars(filters: SearchFilters, sourceCars: Car[] = cars): Car[] {
+  let result = [...sourceCars]
+
+  if (filters.category) {
+    result = result.filter(car => car.category === filters.category)
+  }
+
+  if (filters.query) {
+    const q = filters.query.toLowerCase()
+    result = result.filter(car =>
+      car.name.toLowerCase().includes(q) ||
+      car.brand.toLowerCase().includes(q) ||
+      car.category.toLowerCase().includes(q) ||
+      car.fuelType.toLowerCase().includes(q) ||
+      car.transmission.toLowerCase().includes(q) ||
+      car.engine.toLowerCase().includes(q) ||
+      car.color.toLowerCase().includes(q) ||
+      car.features.some(f => f.toLowerCase().includes(q))
+    )
+  }
+
+  if (filters.minPrice !== undefined) {
+    result = result.filter(car => car.price >= filters.minPrice!)
+  }
+  if (filters.maxPrice !== undefined) {
+    result = result.filter(car => car.price <= filters.maxPrice!)
+  }
+  if (filters.minYear !== undefined) {
+    result = result.filter(car => car.year >= filters.minYear!)
+  }
+  if (filters.maxYear !== undefined) {
+    result = result.filter(car => car.year <= filters.maxYear!)
+  }
+  if (filters.fuelType) {
+    result = result.filter(car => car.fuelType === filters.fuelType)
+  }
+  if (filters.transmission) {
+    result = result.filter(car => car.transmission === filters.transmission)
+  }
+
+  switch (filters.sortBy) {
+    case 'price-asc':
+      result.sort((a, b) => a.price - b.price)
+      break
+    case 'price-desc':
+      result.sort((a, b) => b.price - a.price)
+      break
+    case 'year-desc':
+      result.sort((a, b) => b.year - a.year)
+      break
+    case 'name':
+      result.sort((a, b) => a.name.localeCompare(b.name))
+      break
+    default:
+      result.sort((a, b) => b.year - a.year)
+  }
+
+  return result
+}
+
+export function getUniqueFuelTypes(sourceCars: Car[] = cars): string[] {
+  return [...new Set(sourceCars.map(c => c.fuelType))]
+}
+
+export function getUniqueTransmissions(sourceCars: Car[] = cars): string[] {
+  return [...new Set(sourceCars.map(c => c.transmission))]
+}
+
+export function getPriceRange(sourceCars: Car[] = cars): { min: number; max: number } {
+  if (sourceCars.length === 0) return { min: 0, max: 1 }
+  return {
+    min: Math.min(...sourceCars.map(c => c.price)),
+    max: Math.max(...sourceCars.map(c => c.price)),
+  }
+}
+
+export function getYearRange(sourceCars: Car[] = cars): { min: number; max: number } {
+  if (sourceCars.length === 0) return { min: 0, max: 1 }
+  return {
+    min: Math.min(...sourceCars.map(c => c.year)),
+    max: Math.max(...sourceCars.map(c => c.year)),
+  }
 }

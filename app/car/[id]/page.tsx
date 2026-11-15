@@ -1,54 +1,56 @@
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, Calendar, Gauge, Fuel, Settings, Palette, Zap, CheckCircle2, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Calendar, Gauge, Fuel, Settings, Palette, Zap, CheckCircle2, ChevronRight, ShoppingBag } from 'lucide-react'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
-import { InquiryForm } from '@/components/inquiry-form'
+import InquiryForm from '@/components/inquiry-form'
 import { CarCard } from '@/components/car-card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { getCarById, cars, formatPrice } from '@/lib/cars-data'
+import { formatPrice } from '@/lib/cars-data'
+import { getCar, listCars, listSpares } from '@/lib/catalog-repository'
 import { ScrollToInquiry } from '@/components/scroll-to-inquiry'
 
 interface CarPageProps {
   params: Promise<{ id: string }>
 }
 
-export async function generateStaticParams() {
-  return cars.map((car) => ({
-    id: car.id,
-  }))
-}
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: CarPageProps) {
   const { id } = await params
-  const car = getCarById(id)
-  if (!car) return { title: 'Car Not Found | ALIFARISO Auto Spare' }
+  const car = await getCar(id)
+  if (!car) return { title: 'Car Not Found | ALIFARIS Auto' }
   return {
-    title: `${car.year} ${car.brand} ${car.name} | ALIFARISO Auto Spare`,
+    title: `${car.year} ${car.brand} ${car.name} | ALIFARIS Auto`,
     description: car.description,
   }
 }
 
 export default async function CarPage({ params }: CarPageProps) {
   const { id } = await params
-  const car = getCarById(id)
-  if (!car) notFound()
+  const [car, cars, allSpares] = await Promise.all([getCar(id), listCars(), listSpares()])
+  if (!car) return notFound()
 
   const relatedCars = cars
-    .filter(c => c.category === car.category && c.id !== car.id)
+    .filter((candidate) => candidate.category === car.category && candidate.id !== car.id)
     .slice(0, 3)
+  const compatibleSpares = allSpares.filter((spare) => spare.compatibility.some((fit) =>
+    fit.make.toLowerCase() === car.brand.toLowerCase()
+    && fit.model.toLowerCase() === car.name.toLowerCase()
+    && car.year >= fit.yearFrom
+    && car.year <= fit.yearTo,
+  ))
 
-  // Build gallery: main image + extras, deduplicated, show up to 3 thumbnails
-  const allImages = [car.image, ...car.images.filter(img => img !== car.image)]
+  const allImages = [car.image, ...car.images.filter((image) => image !== car.image)]
   const thumbnails = allImages.slice(0, 3)
 
   return (
     <main className="min-h-screen bg-background">
       <Navigation />
 
-      {/* Back Button */}
+      {/* Back button */}
       <div className="pt-28 pb-4">
         <div className="container mx-auto px-4">
           <Button asChild variant="ghost" className="text-muted-foreground hover:text-primary rounded-full group">
@@ -64,7 +66,7 @@ export default async function CarPage({ params }: CarPageProps) {
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto space-y-6">
 
-            {/* ── HERO IMAGE ── */}
+            {/* Hero image */}
             <div className="relative aspect-[16/9] rounded-3xl overflow-hidden glass border-border/30 card-glow">
               <Image
                 src={car.image}
@@ -78,7 +80,6 @@ export default async function CarPage({ params }: CarPageProps) {
               <Badge className="absolute top-5 left-5 bg-primary text-primary-foreground capitalize px-4 py-1.5 text-sm font-semibold">
                 {car.category}
               </Badge>
-              {/* Car name + price overlaid on the hero */}
               <div className="absolute bottom-6 left-6 right-6 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
                 <div>
                   <p className="text-primary font-semibold text-sm mb-0.5">{car.brand}</p>
@@ -91,9 +92,9 @@ export default async function CarPage({ params }: CarPageProps) {
               </div>
             </div>
 
-            {/* ── PHOTO GALLERY (2–3 thumbnails) ── */}
+            {/* Photo gallery */}
             {thumbnails.length > 1 && (
-              <div className={`grid gap-4 ${thumbnails.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+              <div className={`grid gap-3 sm:gap-4 ${thumbnails.length === 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'}`}>
                 {thumbnails.map((img, i) => (
                   <div
                     key={i}
@@ -111,7 +112,7 @@ export default async function CarPage({ params }: CarPageProps) {
               </div>
             )}
 
-            {/* ── QUICK SPECS ── */}
+            {/* Quick specs */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="glass rounded-2xl p-5 text-center hover-lift card-glow">
                 <Calendar className="w-7 h-7 text-primary mx-auto mb-3" />
@@ -135,13 +136,13 @@ export default async function CarPage({ params }: CarPageProps) {
               </div>
             </div>
 
-            {/* ── ABOUT ── */}
+            {/* About */}
             <div className="glass rounded-2xl p-8 card-glow">
               <h2 className="text-2xl font-bold text-foreground mb-4 red-line pb-2">About This Vehicle</h2>
               <p className="text-muted-foreground leading-relaxed text-lg">{car.description}</p>
             </div>
 
-            {/* ── SPECIFICATIONS ── */}
+            {/* Specifications */}
             <div className="glass rounded-2xl p-8 card-glow">
               <h2 className="text-2xl font-bold text-foreground mb-8 red-line pb-2">Specifications</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -184,7 +185,7 @@ export default async function CarPage({ params }: CarPageProps) {
               </div>
             </div>
 
-            {/* ── KEY FEATURES ── */}
+            {/* Key features */}
             <div className="glass rounded-2xl p-8 card-glow">
               <h2 className="text-2xl font-bold text-foreground mb-8 red-line pb-2">Key Features</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -199,11 +200,39 @@ export default async function CarPage({ params }: CarPageProps) {
               </div>
             </div>
 
-            {/* ── ENQUIRE BUTTON – scrolls to form below ── */}
+            {compatibleSpares.length > 0 && (
+              <section className="rounded-2xl border border-orange-500/30 bg-orange-500/5 p-6 sm:p-8">
+                <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold">Spares for this car</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">Sample compatibility only — please verify fitment before ordering.</p>
+                  </div>
+                  <Link href="/spares" className="text-sm font-semibold text-orange-400 hover:underline">Browse all spares</Link>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {compatibleSpares.slice(0, 4).map((spare) => (
+                    <Link key={spare.id} href={`/spares/${spare.id}`} className="flex min-h-[72px] items-center justify-between gap-3 rounded-xl border border-border bg-background/70 p-4 transition hover:border-orange-500/50">
+                      <span>
+                        <span className="block font-semibold">{spare.name}</span>
+                        <span className="text-xs text-muted-foreground">{spare.partNumber}</span>
+                      </span>
+                      <span className="shrink-0 text-sm font-bold text-orange-400">View part <ChevronRight className="inline h-4 w-4" /></span>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <Link href={`/car-checkout/${encodeURIComponent(car.id)}`} className="flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90">
+              <ShoppingBag className="h-5 w-5" />
+              Request to buy this vehicle
+            </Link>
+
+            {/* Enquire button */}
             <ScrollToInquiry carName={car.name} />
 
-            {/* ── INQUIRY FORM ── */}
-            <div id="inquiry-form" className="pt-4 scroll-mt-28">
+            {/* Inquiry form */}
+            <div id="inquiry-form" className="pt-4 scroll-mt-28 isolate">
               <h2 className="text-3xl font-bold text-foreground mb-4 text-center red-line pb-2 mx-auto w-fit">
                 Interested in this <span className="text-primary">{car.name}</span>?
               </h2>
@@ -217,9 +246,9 @@ export default async function CarPage({ params }: CarPageProps) {
         </div>
       </section>
 
-      {/* Related Vehicles */}
+      {/* Related vehicles */}
       {relatedCars.length > 0 && (
-        <section className="py-20 border-t border-border/30 relative overflow-hidden">
+        <section className="py-20 border-t border-border/30 relative overflow-clip">
           <div className="absolute top-0 left-1/4 w-80 h-80 bg-primary/5 rounded-full blur-3xl" />
           <div className="container mx-auto px-4 relative">
             <div className="flex items-end justify-between mb-10">
